@@ -45,13 +45,20 @@ app.get("/register", function (req, res) {
   res.render("register");
 });
 
+app.get("/shop", function (req, res) {
+  res.render("shop");
+});
+
 app.post("/register", async (req, res) => {
   try {
     const user = await User.register(
       new User({ username: req.body.username }),
       req.body.password
     );
-    return res.status(200).json(user);
+
+    passport.authenticate("local")(req, res, function () {
+      res.redirect("/shop");
+    });
   } catch (error) {
     return res.status(400).json({ error: error.message });
   }
@@ -64,7 +71,7 @@ app.get("/login", function (req, res) {
 app.post(
   "/login",
   passport.authenticate("local", {
-    successRedirect: "/secret",
+    successRedirect: "/shop",
     failureRedirect: "/login",
     failureFlash: true,
   })
